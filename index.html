@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Spatial Intelligence Quotient Test</title>
+    <style>
+        body { background: #121212; color: #e0e0e0; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        #test-container { background: #1e1e1e; padding: 40px; border-radius: 8px; width: 550px; box-shadow: 0 4px 20px rgba(0,0,0,0.8); border-top: 4px solid #3b82f6; }
+        .header { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 0.9rem; color: #888; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .question { font-size: 1.25rem; line-height: 1.5; margin-bottom: 25px; }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        button { background: #2a2a2a; border: 1px solid #333; color: #ddd; padding: 16px; border-radius: 4px; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        button:hover { background: #333; border-color: #3b82f6; }
+        #result { text-align: center; display: none; }
+        .iq-score { font-size: 3.5rem; color: #3b82f6; font-weight: bold; margin: 20px 0; }
+        .hide { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="test-container">
+    <div id="quiz-zone">
+        <div class="header">
+            <span>Spatial IQ Test</span>
+            <span id="progress-text">1/10</span>
+        </div>
+        <div class="question" id="q-text">Loading...</div>
+        <div class="options" id="q-options"></div>
+    </div>
+    <div id="result">
+        <h2>KẾT QUẢ KIỂM TRA</h2>
+        <div class="iq-score" id="iq-val">0</div>
+        <button onclick="location.reload()" style="width:100%; text-align:center;">Làm lại</button>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    { q: "1. Một hình lập phương có dấu chấm ở mặt TRƯỚC. Xoay 90° sang TRÁI, sau đó xoay 180° theo trục NGANG (X). Dấu chấm hiện ở mặt nào?", a: ["Mặt Sau", "Mặt Phải", "Mặt Trên", "Mặt Dưới"], c: 1 },
+    { q: "2. Nếu bạn nhìn một hình chóp lục giác đều từ mặt ĐÁY nhìn lên, bạn sẽ thấy bao nhiêu tam giác?", a: ["0", "1", "6", "12"], c: 0 },
+    { q: "3. Một khối lập phương được sơn đỏ tất cả các mặt, sau đó cắt thành 27 khối nhỏ bằng nhau. Có bao nhiêu khối nhỏ KHÔNG có mặt nào màu đỏ?", a: ["1", "4", "8", "9"], c: 0 },
+    { q: "4. Vật thể nào sau đây khi xoay quanh trục đối xứng của nó 360° sẽ tạo ra một hình trụ?", a: ["Hình tròn", "Hình vuông", "Hình chữ nhật", "Hình tam giác cân"], c: 2 },
+    { q: "5. Nếu gập một tờ giấy hình vuông làm đôi theo đường chéo, sau đó làm đôi một lần nữa theo đường cao của tam giác mới, rồi cắt bỏ một góc nhọn nhất. Khi mở ra, tờ giấy có bao nhiêu lỗ?", a: ["1 lỗ ở giữa", "2 lỗ đối xứng", "4 lỗ", "Không có lỗ"], c: 0 },
+    { q: "6. Một khối đa diện có 6 mặt và 8 đỉnh. Khối đó có bao nhiêu cạnh?", a: ["10 cạnh", "12 cạnh", "14 cạnh", "16 cạnh"], c: 1 },
+    { q: "7. Nhìn từ góc Isometric (góc chéo 45°), một hình lập phương sẽ hiển thị tối đa bao nhiêu mặt cùng lúc?", a: ["2", "3", "4", "6"], c: 1 },
+    { q: "8. Nếu cắt một hình lập phương bằng một mặt phẳng đi qua đúng 3 đỉnh của nó, thiết diện nhận được là hình gì?", a: ["Tam giác đều", "Hình vuông", "Hình ngũ giác", "Hình lục giác"], c: 0 },
+    { q: "9. Dấu chấm ở mặt PHẢI. Xoay 90° sang PHẢI, sau đó xoay 90° xuống DƯỚI (về phía người xem). Dấu chấm hiện ở đâu?", a: ["Mặt Sau", "Mặt Trước", "Mặt Dưới", "Mặt Phải"], c: 2 },
+    { q: "10. Một hình hộp chữ nhật có 3 kích thước khác nhau. Có tối đa bao nhiêu mặt phẳng đối xứng?", a: ["2", "3", "4", "6"], c: 1 }
+];
+
+let currentQ = 0, score = 0;
+
+function loadQ() {
+    const data = quizData[currentQ];
+    document.getElementById('q-text').innerText = data.q;
+    document.getElementById('progress-text').innerText = `${currentQ + 1}/${quizData.length}`;
+    const optDiv = document.getElementById('q-options');
+    optDiv.innerHTML = '';
+    data.a.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.onclick = () => {
+            if(i === data.c) score++;
+            currentQ++;
+            currentQ < quizData.length ? loadQ() : showResult();
+        };
+        optDiv.appendChild(btn);
+    });
+}
+
+function showResult() {
+    document.getElementById('quiz-zone').classList.add('hide');
+    document.getElementById('result').style.display = 'block';
+    // Công thức tính IQ ước lượng dựa trên độ khó câu hỏi (Base 85 + 6.5 per correct answer)
+    const finalIQ = 85 + (score * 6.5);
+    document.getElementById('iq-val').innerText = Math.round(finalIQ);
+}
+
+loadQ();
+</script>
+</body>
+</html>
